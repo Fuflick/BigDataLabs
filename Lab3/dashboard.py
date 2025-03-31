@@ -1,7 +1,10 @@
+# streamlit run dashboard.py  - command to run
+# .venv/bin/activate - local venv activaation comand
+
+
 import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
 
 # Функция загрузки и предобработки данных
@@ -31,13 +34,13 @@ age_range = st.sidebar.slider(
     'Диапазон возраста',
     min_value=0,
     max_value=100,
-    value=(0, 80)  # ✅ Закрыта скобка
+    value=(0, 100)  # Указываем начальное значение как кортеж
 )
 
 selected_class = st.sidebar.multiselect(
     'Класс пассажиров',
     options=['First', 'Second', 'Third'],
-    default=['First', 'Second', 'Third']  # ✅ Убрана лишняя запятая
+    default=['First', 'Second', 'Third']
 )
 
 # Применение фильтров
@@ -94,4 +97,4 @@ st.dataframe(filtered_data.describe(), use_container_width=True)
 # Отображение сырых данных
 if st.checkbox('Показать исходные данные'):
     st.subheader('Исходные данные')
-    st.dataframe(filtered_data, use_container_width=True)  # ✅ Убрана лишняя `/`
+    st.dataframe(filtered_data, use_container_width=True)
