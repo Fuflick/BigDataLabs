@@ -1,11 +1,11 @@
-# streamlit run dashboard.py  - command to run
-# .venv/bin/activate - local venv activaation comand
-
-
 import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+
+# source .venv/bin/activate
+# streamlit run dashboard.py
 
 # Функция загрузки и предобработки данных
 @st.cache_data
@@ -34,7 +34,7 @@ age_range = st.sidebar.slider(
     'Диапазон возраста',
     min_value=0,
     max_value=100,
-    value=(0, 100)  # Указываем начальное значение как кортеж
+    value=(0, 100)
 )
 
 selected_class = st.sidebar.multiselect(
@@ -54,7 +54,7 @@ filtered_data = df[
 st.header('Визуализация данных')
 chart_type = st.selectbox(
     'Выберите тип графика',
-    ['Гистограмма возрастов', 'Ящик с усами (Fare/Class)', 'Корреляционная матрица']
+    ['Гистограмма возрастов', 'Ящик с усами (Fare/Class)', 'Корреляционная матрица', 'Анализ выбросов']
 )
 
 # Построение графиков
@@ -80,7 +80,7 @@ elif chart_type == 'Ящик с усами (Fare/Class)':
 elif chart_type == 'Корреляционная матрица':
     fig, ax = plt.subplots(figsize=(10, 8))
     sns.heatmap(
-        filtered_data.corr(),
+        filtered_data.corr(numeric_only=True),
         annot=True,
         cmap='coolwarm',
         fmt=".2f",
@@ -88,6 +88,37 @@ elif chart_type == 'Корреляционная матрица':
     )
     plt.title('Корреляции между признаками')
     st.pyplot(fig)
+
+elif chart_type == 'Анализ выбросов':
+    # Анализ выбросов в стоимости билетов
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.boxplot(x=df['fare'], palette='pastel')
+    plt.title('Выбросы в стоимости билетов')
+    st.pyplot(fig)
+
+    # Анализ выбросов в возрасте
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.boxplot(x=df['age'], palette='pastel')
+    plt.title('Выбросы в возрасте пассажиров')
+    st.pyplot(fig)
+
+    # Функция поиска выбросов по межквартильному размаху (IQR)
+    def detect_outliers(df, column):
+        Q1 = df[column].quantile(0.25)
+        Q3 = df[column].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        return df[(df[column] < lower_bound) | (df[column] > upper_bound)]
+
+    outliers_fare = detect_outliers(df, 'fare')
+    outliers_age = detect_outliers(df, 'age')
+
+    st.subheader("Выбросы в стоимости билетов")
+    st.dataframe(outliers_fare)
+
+    st.subheader("Выбросы в возрасте пассажиров")
+    st.dataframe(outliers_age)
 
 # Отображение статистики
 st.markdown("---")
