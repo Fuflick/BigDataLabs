@@ -1,11 +1,11 @@
+# source .venv/bin/activate
+# streamlit run dashboard.py
+
 import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
-# source .venv/bin/activate
-# streamlit run dashboard.py
 
 # Функция загрузки и предобработки данных
 @st.cache_data
